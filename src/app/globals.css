@@ -1,0 +1,70 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+:root {
+  --background: #121212;
+  --foreground: #ededed;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary-50: #faf5ff;
+  --color-primary-100: #f3e8ff;
+  --color-primary-200: #e9d5ff;
+  --color-primary-300: #d8b4fe;
+  --color-primary: #a855f7;
+  --color-primary-400: #c084fc;
+  --color-primary-500: #a855f7;
+  --color-primary-600: #9333ea;
+  --color-primary-700: #7e22ce;
+  --color-primary-800: #6b21a8;
+  --color-primary-900: #581c87;
+  --color-primary-950: #3b0764;
+  --color-elevated: #1a1a1a;
+  --color-secondary: #1d1d1d;
+  --color-subtle: #2a2a2a;
+  --color-default: #333333;
+  --color-medium: #444444;
+  --color-strong: #555555;
+  --color-high: #222222;
+  --color-base: #121212;
+  --shadow-mode: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)';
+}
+
+@layer base {
+  * {
+    @apply m-0 box-border p-0;
+  }
+  body {
+    color: var(--foreground);
+    background: var(--background);
+    font-family:
+      var(--font-inter),
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      Roboto,
+      Oxygen,
+      Ubuntu,
+      Cantarell,
+      'Open Sans',
+      'Helvetica Neue',
+      sans-serif;
+  }
+
+  h1 {
+    @apply tracking-tight;
+  }
+}
+
+@layer utilities {
+  .bb {
+    border: 1px solid red;
+  }
+
+  .link-animation {
+    @apply transition-colors duration-100 hover:text-purple-400;
+  }
+}
