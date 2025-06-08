@@ -5,7 +5,7 @@ import { FooterLinks } from '@/components/FooterLinks';
 import { getSession } from '@/lib/auth';
 import { Suspense } from 'react';
 
-async function MainBotton() {
+async function MainButton() {
   const session = await getSession();
 
   if (!session || !session.isActiveSession) {
@@ -50,7 +50,7 @@ export default async function MarketingLayout({ children }: { children: React.Re
                   </Link>
                 }
               >
-                <MainBotton />
+                <MainButton />
               </Suspense>
 
               <Link href="/signup">

@@ -1,9 +1,14 @@
 import { getCurrentUser } from '@/lib/dal';
 import { UserIcon } from 'lucide-react';
 import { SignOutButton } from './SignOutButton';
+import { redirect } from 'next/navigation';
 
 export async function UserEmail() {
   const user = await getCurrentUser();
+
+  if (!user) {
+    redirect('/');
+  }
 
   return (
     <div className="space-y-1">

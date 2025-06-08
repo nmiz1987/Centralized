@@ -1,16 +1,8 @@
 import { Suspense } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
-import { redirect } from 'next/navigation';
-import { getSession } from '@/lib/auth';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const session = await getSession();
-
-  if (!session || !session.isActiveSession) {
-    redirect('/');
-  }
-
   return (
     <div className="min-h-screen">
       <Navigation />
