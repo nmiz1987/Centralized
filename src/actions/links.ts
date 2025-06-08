@@ -2,7 +2,7 @@
 
 import { db } from '@/db';
 import { links } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { getCurrentUser } from '@/lib/dal';
 import { revalidateTag } from 'next/cache';
 import { CACHE_TAGS } from '@/lib/constants';
@@ -39,13 +39,13 @@ export async function createLink(data: LinkData): Promise<ActionResponse> {
     // Create link with validated data
     const validatedData = validationResult.data;
     await db.insert(links).values({
-      category: validatedData.category,
+      category: validatedData.category ?? 'General',
       icon: validatedData.icon,
       name: validatedData.name,
       url: validatedData.url,
       isRecommended: validatedData.isRecommended,
       description: validatedData.description,
-      userId: validatedData.userId,
+      userId: user.id,
     });
 
     revalidateTag(CACHE_TAGS.allLinks);
@@ -90,7 +90,7 @@ export async function updateLink(id: number, data: Partial<LinkData>): Promise<A
     const validatedData = validationResult.data;
     const updateData: Record<string, unknown> = {};
 
-    if (validatedData.category !== undefined) updateData.category = validatedData.category;
+    updateData.category = validatedData.category || 'General';
     if (validatedData.icon !== undefined) updateData.icon = validatedData.icon;
     if (validatedData.name !== undefined) updateData.name = validatedData.name;
     if (validatedData.description !== undefined) updateData.description = validatedData.description;
@@ -98,7 +98,10 @@ export async function updateLink(id: number, data: Partial<LinkData>): Promise<A
     if (validatedData.isRecommended !== undefined) updateData.isRecommended = validatedData.isRecommended;
 
     // Update link
-    await db.update(links).set(updateData).where(eq(links.id, id));
+    await db
+      .update(links)
+      .set(updateData)
+      .where(and(eq(links.id, id), eq(links.userId, user.id)));
 
     revalidateTag(CACHE_TAGS.allLinks);
     revalidateTag(CACHE_TAGS.allCategories);

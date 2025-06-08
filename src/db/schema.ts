@@ -6,7 +6,7 @@ export const links = pgTable('links', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   description: text('description').notNull(),
-  category: text('category').notNull(),
+  category: text('category').notNull().default('General'),
   url: text('url').notNull(),
   icon: text('icon'),
   isRecommended: boolean('is_recommended').default(false).notNull(),

@@ -11,5 +11,5 @@ export async function NewLink() {
     redirect('/signin');
   }
 
-  return <LinkForm userId={user.id} categories={categories ?? []} />;
+  return <LinkForm categories={categories ?? []} />;
 }

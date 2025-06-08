@@ -9,7 +9,6 @@ import { Button } from './ui/button';
 
 interface LinkFormProps {
   link?: Link;
-  userId: string;
   isEditing?: boolean;
   categories: string[];
 }
@@ -20,7 +19,7 @@ const initialState: ActionResponse = {
   errors: undefined,
 };
 
-export function LinkForm({ link, userId, isEditing = false, categories }: LinkFormProps) {
+export function LinkForm({ link, isEditing = false, categories }: LinkFormProps) {
   const router = useRouter();
 
   const [state, formAction, isPending] = useActionState<ActionResponse, FormData>(async (prevState: ActionResponse, formData: FormData) => {
@@ -33,7 +32,6 @@ export function LinkForm({ link, userId, isEditing = false, categories }: LinkFo
         icon: formData.get('icon') as string,
         url: formData.get('url') as string,
         isRecommended: formData.get('isRecommended') === 'true',
-        userId,
       };
 
       // Call the appropriate action based on whether we're editing or creating

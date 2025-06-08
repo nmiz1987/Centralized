@@ -22,11 +22,14 @@ export const SignUpSchema = z
 export const LinkSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters').max(100, 'Name must be less than 100 characters'),
   description: z.string().min(3, 'Description must be at least 3 characters').max(255, 'Description must be less than 255 characters'),
-  category: z.string().min(3, 'Category must be at least 3 characters').max(100, 'Category must be less than 100 characters'),
-  url: z.string().min(3, 'URL must be at least 3 characters').max(255, 'URL must be less than 255 characters'),
-  icon: z.string().min(3, 'Icon must be at least 3 characters').max(255, 'Icon must be less than 255 characters'),
-  isRecommended: z.boolean().default(false),
-  userId: z.string().min(1, 'User ID is required'),
+  category: z.string().max(100, 'Category must be less than 100 characters').optional(),
+  url: z
+    .string()
+    .min(3, 'URL must be at least 3 characters')
+    .max(255, 'URL must be less than 255 characters')
+    .startsWith('http', 'The URL must starts with http!'),
+  icon: z.string().min(3, 'Icon must be at least 3 characters').max(255, 'Icon must be less than 255 characters').optional(),
+  isRecommended: z.boolean().default(false).optional(),
 });
 
 export type LinkData = z.infer<typeof LinkSchema>;

@@ -14,7 +14,7 @@ export type ActionResponse = {
   values?: Record<string, string>;
 };
 
-export async function signIn(formData: FormData): Promise<ActionResponse> {
+export async function signIn(formData: FormData, fromAPI: boolean = false): Promise<ActionResponse> {
   try {
     // Extract data from form
     const data = {
@@ -29,7 +29,7 @@ export async function signIn(formData: FormData): Promise<ActionResponse> {
         success: false,
         message: 'Validation failed',
         errors: validationResult.error.flatten().fieldErrors,
-        values: data,
+        ...(fromAPI && { values: data }),
       };
     }
 
@@ -39,7 +39,7 @@ export async function signIn(formData: FormData): Promise<ActionResponse> {
       return {
         success: false,
         message: 'Invalid email or password',
-        values: data,
+        ...(fromAPI && { values: data }),
       };
     }
 
@@ -49,7 +49,7 @@ export async function signIn(formData: FormData): Promise<ActionResponse> {
       return {
         success: false,
         message: 'Invalid email or password',
-        values: data,
+        ...(fromAPI && { values: data }),
       };
     }
 
@@ -60,7 +60,6 @@ export async function signIn(formData: FormData): Promise<ActionResponse> {
     return {
       success: true,
       message: 'Signed in successfully',
-      values: data,
     };
   } catch (error) {
     console.error('Sign in error:', error);
@@ -74,7 +73,7 @@ export async function signIn(formData: FormData): Promise<ActionResponse> {
   }
 }
 
-export async function signUp(formData: FormData): Promise<ActionResponse> {
+export async function signUp(formData: FormData, fromAPI: boolean = false): Promise<ActionResponse> {
   try {
     // Extract data from form
     const data = {
@@ -88,7 +87,7 @@ export async function signUp(formData: FormData): Promise<ActionResponse> {
       return {
         success: false,
         message: 'Ops! Passwords do not match',
-        values: data,
+        ...(fromAPI && { values: data }),
       };
     }
 
@@ -99,7 +98,7 @@ export async function signUp(formData: FormData): Promise<ActionResponse> {
         success: false,
         message: 'Validation failed',
         errors: validationResult.error.flatten().fieldErrors,
-        values: data,
+        ...(fromAPI && { values: data }),
       };
     }
 
@@ -112,7 +111,7 @@ export async function signUp(formData: FormData): Promise<ActionResponse> {
         errors: {
           email: ['Try another email'],
         },
-        values: data,
+        ...(fromAPI && { values: data }),
       };
     }
 
@@ -125,7 +124,7 @@ export async function signUp(formData: FormData): Promise<ActionResponse> {
         errors: {
           error: ['Failed to create user'],
         },
-        values: data,
+        ...(fromAPI && { values: data }),
       };
     }
 

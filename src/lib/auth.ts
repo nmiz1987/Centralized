@@ -5,7 +5,10 @@ import { db } from '@/db';
 import { users } from '@/db/schema';
 import * as jose from 'jose';
 import { eq } from 'drizzle-orm';
-// import { cache } from 'react';
+import { getCurrentUser } from './dal';
+import { NextRequest, NextResponse } from 'next/server';
+
+type RouteHandler = (req: NextRequest) => Promise<NextResponse>;
 
 // JWT types
 interface JWTPayload {
@@ -152,4 +155,22 @@ export const getSession = async () => {
 export async function deleteSession() {
   const cookieStore = await cookies();
   cookieStore.delete('auth_token');
+}
+
+// Middleware to check if user is authenticated
+export function withUser(handler: RouteHandler): RouteHandler {
+  return async (req: NextRequest) => {
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return NextResponse.json(
+        {
+          message: 'Unauthorized',
+        },
+        { status: 401 },
+      );
+    }
+
+    return handler(req);
+  };
 }

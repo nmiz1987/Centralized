@@ -24,7 +24,7 @@ export default async function EditLinkPage({ params }: { params: Promise<{ id: s
       <h1 className="mb-6 text-2xl font-bold">Edit Link</h1>
 
       <div className="bg-elevated border-default rounded-lg border p-6 shadow-sm">
-        <LinkForm userId={link.userId} categories={categories ?? []} link={link} isEditing />
+        <LinkForm categories={categories ?? []} link={link} isEditing />
       </div>
     </div>
   );

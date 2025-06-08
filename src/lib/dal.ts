@@ -91,9 +91,6 @@ export async function getLinksByUserId(userId: string, category?: string, search
     }
 
     const result = await db.query.links.findMany({
-      with: {
-        user: true,
-      },
       orderBy: (links, { desc }) => [desc(links.createdAt)],
       where: and(...conditions),
     });
