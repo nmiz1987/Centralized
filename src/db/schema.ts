@@ -8,7 +8,7 @@ export const links = pgTable('links', {
   description: text('description').notNull(),
   category: text('category').notNull(),
   url: text('url').notNull(),
-  icon: text('icon').notNull(),
+  icon: text('icon'),
   isRecommended: boolean('is_recommended').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),

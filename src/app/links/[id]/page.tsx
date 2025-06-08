@@ -26,7 +26,7 @@ export default async function LinkPage({ params }: { params: Promise<{ id: strin
         </Link>
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <span className="flex items-center gap-2">
-            <Icon alt={name} icon={icon} />
+            <Icon alt={name} icon={icon ?? ''} />
             <h1 className="text-3xl font-bold">{name}</h1>
           </span>
           <div className="flex items-center space-x-2">
@@ -63,9 +63,14 @@ export default async function LinkPage({ params }: { params: Promise<{ id: strin
 
           <div className="">
             <p className="mb-1 text-sm font-medium text-gray-500">URL</p>
-            <Link href={url} target="_blank" className="link-animation block max-w-full truncate overflow-hidden whitespace-nowrap" title={url}>
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link-animation block max-w-full truncate overflow-hidden whitespace-nowrap"
+            >
               {url}
-            </Link>
+            </a>
           </div>
         </div>
         <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
