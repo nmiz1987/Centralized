@@ -4,9 +4,9 @@ import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen">
+    <div className="flex min-h-screen flex-col sm:flex-row">
       <Navigation />
-      <main className="min-h-screen pt-0 pl-16 md:pl-52 lg:pl-64">
+      <main className="min-h-screen">
         <div className="mx-auto max-w-6xl p-4 md:p-8">
           <Suspense fallback={<DashboardSkeleton />}>{children}</Suspense>
         </div>
