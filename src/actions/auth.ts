@@ -147,7 +147,7 @@ export async function signUp(formData: FormData, fromAPI: boolean = false): Prom
   }
 }
 
-export async function signOut(): Promise<void> {
+export async function signOut(redirectAfterSignOut: boolean = true): Promise<void> {
   try {
     await deleteSession();
     // Expire all cache tags
@@ -158,6 +158,8 @@ export async function signOut(): Promise<void> {
     console.error('Sign out error:', error);
     throw new Error('Failed to sign out');
   } finally {
-    redirect('/signin');
+    if (redirectAfterSignOut) {
+      redirect('/signin');
+    }
   }
 }
