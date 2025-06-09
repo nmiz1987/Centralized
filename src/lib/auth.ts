@@ -1,4 +1,4 @@
-import { compare, hash } from 'bcrypt';
+import { compare, hash, genSalt } from 'bcrypt';
 import { nanoid } from 'nanoid';
 import { cookies } from 'next/headers';
 import { db } from '@/db';
@@ -24,12 +24,31 @@ const JWT_EXPIRATION = process.env.JWT_EXPIRATION || '1d'; // 1 days
 
 // Hash a password
 export async function hashPassword(password: string) {
-  return hash(password, 10);
+  const salt = await genSalt();
+  return hash(password, salt);
 }
 
 // Verify a password
 export async function verifyPassword(password: string, hashedPassword: string) {
   return compare(password, hashedPassword);
+}
+
+export async function resetPassword(userId: string, newPassword: string) {
+  try {
+    const user = await db.select().from(users).where(eq(users.id, userId));
+
+    if (!user) {
+      return { success: false, message: 'User not found' };
+    }
+
+    const hashNewPassword = await hashPassword(newPassword);
+    await db.update(users).set({ password: hashNewPassword }).where(eq(users.id, userId));
+
+    return { success: true, message: 'Password reset successfully' };
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    return { success: false, message: 'Failed to reset password' };
+  }
 }
 
 // Create a new user
