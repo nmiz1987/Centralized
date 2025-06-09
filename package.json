@@ -10,7 +10,11 @@
     "seed": "tsx scripts/seed.ts",
     "db:push-local": "NODE_ENV=development drizzle-kit push",
     "db:push-prod": "NODE_ENV=production drizzle-kit push",
-    "db:studio": "NODE_ENV=development drizzle-kit studio"
+    "db:studio": "NODE_ENV=development drizzle-kit studio",
+    "format": "prettier --write \"**/*.{js,jsx,json,md,ts,tsx}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,json,md,ts,tsx}\"",
+    "typeCheck": "tsc --noEmit",
+    "typeCheck-watch": "tsc --watch --noEmit"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.0",
@@ -44,6 +48,7 @@
     "drizzle-kit": "^0.31.1",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
+    "husky": "^9.1.7",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "tailwindcss": "^4",
