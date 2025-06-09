@@ -41,7 +41,7 @@ export default function SignInPage() {
 
   return (
     <div className="flex h-screen flex-col items-center pt-14">
-      <h1 className="mb-10 text-3xl font-bold">Create a new account</h1>
+      <h1 className="mb-10 text-3xl font-bold">Login to your account</h1>
       <div className="flex w-full items-center justify-center px-6">
         <div className="bg-secondary w-full max-w-lg rounded-lg p-8">
           <Form action={formAction}>
