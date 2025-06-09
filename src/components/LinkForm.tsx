@@ -6,6 +6,8 @@ import { Link } from '@/db/schema';
 import { Form, FormGroup, FormLabel, FormInput, FormTextarea, FormError, FormSelect } from './ui/Form';
 import { createLink, updateLink, type ActionResponse } from '@/actions/links';
 import { Button } from './ui/button';
+import toast from 'react-hot-toast';
+import { TOAST_STYLES } from '@/lib/constants';
 
 interface LinkFormProps {
   link?: Link;
@@ -39,6 +41,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
 
       // Handle successful submission
       if (result.success) {
+        toast.success(result.message, TOAST_STYLES.success);
         router.refresh();
         if (!isEditing) {
           router.push('/dashboard');
@@ -57,7 +60,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
 
   return (
     <Form action={formAction}>
-      {state?.message && (
+      {state?.message && !state.success && (
         <FormError className={`mb-4 rounded-lg px-4 py-2 ${state.success ? 'border-green-300 bg-green-100 text-green-800' : ''}`}>
           {state.message}
         </FormError>
@@ -191,7 +194,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
         <Button type="button" variant="ghost" onClick={() => router.back()} disabled={isPending}>
           Cancel
         </Button>
-        <Button type="submit" isLoading={isPending}>
+        <Button type="submit" isLoading={isPending} disabled={isPending}>
           {isEditing ? 'Update Link' : 'Create Link'}
         </Button>
       </div>
