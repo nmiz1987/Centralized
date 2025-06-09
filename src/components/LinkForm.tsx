@@ -79,7 +79,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
         />
         {state?.errors?.name && (
           <p id="name-error" className="text-sm text-red-500">
-            {state.errors.name[0]}
+            {state.errors.name.join(', ')}
           </p>
         )}
       </FormGroup>
@@ -100,7 +100,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
         />
         {state?.errors?.description && (
           <p id="description-error" className="text-sm text-red-500">
-            {state.errors.description[0]}
+            {state.errors.description.join(', ')}
           </p>
         )}
       </FormGroup>
@@ -119,7 +119,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
         />
         {state?.errors?.category && (
           <p id="category-error" className="text-sm text-red-500">
-            {state.errors.category[0]}
+            {state.errors.category.join(', ')}
           </p>
         )}
         <datalist id="categories">
@@ -142,7 +142,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
         />
         {state?.errors?.url && (
           <p id="url-error" className="text-sm text-red-500">
-            {state.errors.url[0]}
+            {state.errors.url.join(', ')}
           </p>
         )}
       </FormGroup>
@@ -160,7 +160,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
         />
         {state?.errors?.icon && (
           <p id="icon-error" className="text-sm text-red-500">
-            {state.errors.icon[0]}
+            {state.errors.icon.join(', ')}
           </p>
         )}
       </FormGroup>
@@ -182,7 +182,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
         />
         {state?.errors?.isRecommended && (
           <p id="is-recommended-error" className="text-sm text-red-500">
-            {state.errors.isRecommended[0]}
+            {state.errors.isRecommended.join(', ')}
           </p>
         )}
       </FormGroup>

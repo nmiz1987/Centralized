@@ -1,9 +1,9 @@
 'use server';
 
-import { verifyPassword, createSession, createUser, deleteSession, updateUserLastVisitedAt } from '@/lib/auth';
+import { verifyPassword, createSession, createUser, deleteSession, updateUserLastVisitedAt, resetUserPassword, getSession } from '@/lib/auth';
 import { getUserByEmail } from '@/lib/dal';
 import { redirect } from 'next/navigation';
-import { SignInSchema, SignUpSchema } from '@/lib/schemas';
+import { ResetPasswordSchema, SignInSchema, SignUpSchema } from '@/lib/schemas';
 import { CACHE_TAGS } from '@/lib/constants';
 import { unstable_expireTag as expireTag } from 'next/cache';
 
@@ -13,6 +13,58 @@ export type ActionResponse = {
   errors?: Record<string, string[]>;
   values?: Record<string, string>;
 };
+
+export async function resetPassword(formData: FormData): Promise<ActionResponse> {
+  try {
+    const session = await getSession();
+
+    if (!session || !session.isActiveSession) {
+      return {
+        success: false,
+        message: 'You are not logged in',
+      };
+    }
+
+    // Extract data from form
+    const data = {
+      newPassword: formData.get('newPassword') as string,
+      confirmPassword: formData.get('confirmPassword') as string,
+    };
+
+    // Check if passwords match
+    if (data.newPassword !== data.confirmPassword) {
+      return {
+        success: false,
+        message: 'Ops! Passwords do not match',
+      };
+    }
+
+    // Validate with Zod
+    const validationResult = ResetPasswordSchema.safeParse(data);
+    if (!validationResult.success) {
+      console.log('===>', validationResult.error.flatten().fieldErrors);
+      return {
+        success: false,
+        message: 'Validation failed',
+        errors: validationResult.error.flatten().fieldErrors,
+      };
+    }
+
+    // Find user by email
+    const result = await resetUserPassword(session.userId, data.newPassword);
+
+    return result;
+  } catch (error) {
+    console.error('Reset password error:', error);
+    return {
+      success: false,
+      message: 'An error occurred while resetting password',
+      errors: {
+        error: ['Failed to reset password'],
+      },
+    };
+  }
+}
 
 export async function signIn(formData: FormData, fromAPI: boolean = false): Promise<ActionResponse> {
   try {

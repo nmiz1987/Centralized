@@ -33,7 +33,7 @@ export async function verifyPassword(password: string, hashedPassword: string) {
   return compare(password, hashedPassword);
 }
 
-export async function resetPassword(userId: string, newPassword: string) {
+export async function resetUserPassword(userId: string, newPassword: string) {
   try {
     const user = await db.select().from(users).where(eq(users.id, userId));
 

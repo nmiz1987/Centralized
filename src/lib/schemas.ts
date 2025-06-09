@@ -18,6 +18,17 @@ export const SignUpSchema = z
     path: ['confirmPassword'],
   });
 
+// Define Zod schema for reset password validation
+export const ResetPasswordSchema = z
+  .object({
+    newPassword: z.string().min(6, 'Password must be at least 6 characters'),
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine(data => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
+
 // Define Zod schema for links validation
 export const LinkSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters').max(100, 'Name must be less than 100 characters'),
@@ -36,3 +47,4 @@ export type LinkData = z.infer<typeof LinkSchema>;
 
 export type SignInData = z.infer<typeof SignInSchema>;
 export type SignUpData = z.infer<typeof SignUpSchema>;
+export type ResetPasswordData = z.infer<typeof ResetPasswordSchema>;
