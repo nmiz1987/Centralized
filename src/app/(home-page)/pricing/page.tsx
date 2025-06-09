@@ -7,7 +7,7 @@ export default async function PricingPage() {
       <p className="mt-10 px-4 text-center text-lg text-balance text-gray-300">No cost, no hidden fees, no subscriptions. FREE forever.</p>
       <p className="mt-10 px-4 text-center text-lg text-balance text-gray-300">
         Want the code and host it yourself?{' '}
-        <Link href="https://github.com/nmiz1987/centralized" className="link-animation text-md text-gray-300 underline">
+        <Link href={process.env.GITHUB_REPO!} className="link-animation text-md text-gray-300 underline">
           View the source code on GitHub
         </Link>
       </p>

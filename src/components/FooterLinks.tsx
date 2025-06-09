@@ -27,12 +27,7 @@ export function FooterLinks() {
           <h3 className="mb-4 text-sm font-semibold">Resources</h3>
           <ul className="space-y-2">
             <li>
-              <a
-                href="https://github.com/nmiz1987/centralized"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="link-animation text-sm text-gray-600"
-              >
+              <a href={process.env.GITHUB_REPO!} target="_blank" rel="noopener noreferrer" className="link-animation text-sm text-gray-600">
                 GitHub
               </a>
             </li>
