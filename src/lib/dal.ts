@@ -27,7 +27,7 @@ export async function getCategoriesByUserId(userId: string) {
 export async function getCategories() {
   try {
     const session = await getSession();
-    if (!session) return null;
+    if (!session || !session.isActiveSession) return null;
 
     const results = await getCategoriesByUserId(session.userId);
     return results;
@@ -41,7 +41,7 @@ export async function getCategories() {
 export const getCurrentUser = cache(async () => {
   try {
     const session = await getSession();
-    if (!session) return null;
+    if (!session || !session.isActiveSession) return null;
 
     const result = await db.query.users.findFirst({
       where: eq(users.id, session.userId),
@@ -105,7 +105,7 @@ export async function getLinks(category?: string, search?: string) {
   try {
     const session = await getSession();
 
-    if (!session) return [];
+    if (!session || !session.isActiveSession) return [];
 
     const results = await getLinksByUserId(session.userId, category, search);
 
@@ -119,13 +119,10 @@ export async function getLinks(category?: string, search?: string) {
 export async function getLink(id: number) {
   try {
     const session = await getSession();
-    if (!session) return null;
+    if (!session || !session.isActiveSession) return null;
 
     const result = await db.query.links.findFirst({
-      with: {
-        user: true,
-      },
-      where: (links, { eq }) => eq(links.id, id),
+      where: and(eq(links.userId, session.userId), eq(links.id, id)),
     });
 
     if (!result) return null;

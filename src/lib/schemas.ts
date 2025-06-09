@@ -28,7 +28,7 @@ export const LinkSchema = z.object({
     .min(3, 'URL must be at least 3 characters')
     .max(255, 'URL must be less than 255 characters')
     .startsWith('http', 'The URL must starts with http!'),
-  icon: z.string().min(3, 'Icon must be at least 3 characters').max(255, 'Icon must be less than 255 characters').optional(),
+  icon: z.string().max(255, 'Icon must be less than 255 characters').optional(),
   isRecommended: z.boolean().default(false).optional(),
 });
 

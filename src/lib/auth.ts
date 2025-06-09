@@ -157,7 +157,7 @@ export async function deleteSession() {
   cookieStore.delete('auth_token');
 }
 
-// Middleware to check if user is authenticated
+// Check if user is authenticated with cookies
 export function withUser(handler: RouteHandler): RouteHandler {
   return async (req: NextRequest) => {
     const user = await getCurrentUser();
@@ -171,6 +171,19 @@ export function withUser(handler: RouteHandler): RouteHandler {
       );
     }
 
+    return handler(req);
+  };
+}
+
+// Check if user is authenticated with Authorization header
+export function withAuth(handler: RouteHandler): RouteHandler {
+  return async (req: NextRequest) => {
+    const authHeader = req.headers.get('Authorization');
+
+    // If no Authorization header is present, return a 401 Unauthorized response
+    if (!authHeader) {
+      return NextResponse.json({ success: false, message: 'Authorization header is required' }, { status: 401 });
+    }
     return handler(req);
   };
 }

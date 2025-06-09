@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/db';
-import { links } from '@/db/schema';
+import { Link, links } from '@/db/schema';
 import { and, eq } from 'drizzle-orm';
 import { getCurrentUser } from '@/lib/dal';
 import { revalidateTag } from 'next/cache';
@@ -12,6 +12,7 @@ export type ActionResponse = {
   success: boolean;
   message: string;
   errors?: Record<string, string[]>;
+  data?: Link;
 };
 
 export async function createLink(data: LinkData): Promise<ActionResponse> {
@@ -38,20 +39,23 @@ export async function createLink(data: LinkData): Promise<ActionResponse> {
 
     // Create link with validated data
     const validatedData = validationResult.data;
-    await db.insert(links).values({
-      category: validatedData.category ?? 'General',
-      icon: validatedData.icon,
-      name: validatedData.name,
-      url: validatedData.url,
-      isRecommended: validatedData.isRecommended,
-      description: validatedData.description,
-      userId: user.id,
-    });
+    const newLink = await db
+      .insert(links)
+      .values({
+        category: validatedData.category ?? 'General',
+        icon: validatedData.icon,
+        name: validatedData.name,
+        url: validatedData.url,
+        isRecommended: validatedData.isRecommended,
+        description: validatedData.description,
+        userId: user.id,
+      })
+      .returning();
 
     revalidateTag(CACHE_TAGS.allLinks);
     revalidateTag(CACHE_TAGS.allCategories);
 
-    return { success: true, message: 'Link created successfully' };
+    return { success: true, message: 'Link created successfully', data: newLink[0] };
   } catch (error) {
     console.error('Error creating link:', error);
     return {
@@ -62,7 +66,7 @@ export async function createLink(data: LinkData): Promise<ActionResponse> {
   }
 }
 
-export async function updateLink(id: number, data: Partial<LinkData>): Promise<ActionResponse> {
+export async function updateLink(id: number, data: Partial<Link>): Promise<ActionResponse> {
   try {
     // Security check - ensure user is authenticated
     const user = await getCurrentUser();
@@ -71,6 +75,18 @@ export async function updateLink(id: number, data: Partial<LinkData>): Promise<A
         success: false,
         message: 'Unauthorized access',
         errors: { error: ['Unauthorized'] },
+      };
+    }
+
+    // check if the link exists
+    const link = await db
+      .select()
+      .from(links)
+      .where(and(eq(links.id, id), eq(links.userId, user.id)));
+    if (!link || link.length === 0) {
+      return {
+        success: false,
+        message: 'Link not found',
       };
     }
 
@@ -98,15 +114,16 @@ export async function updateLink(id: number, data: Partial<LinkData>): Promise<A
     if (validatedData.isRecommended !== undefined) updateData.isRecommended = validatedData.isRecommended;
 
     // Update link
-    await db
+    const updatedLink = await db
       .update(links)
       .set(updateData)
-      .where(and(eq(links.id, id), eq(links.userId, user.id)));
+      .where(and(eq(links.id, id), eq(links.userId, user.id)))
+      .returning();
 
     revalidateTag(CACHE_TAGS.allLinks);
     revalidateTag(CACHE_TAGS.allCategories);
 
-    return { success: true, message: 'Link updated successfully' };
+    return { success: true, message: 'Link updated successfully', data: updatedLink[0] };
   } catch (error) {
     console.error('Error updating link:', error);
     return {
@@ -124,9 +141,22 @@ export async function deleteLink(id: number) {
     if (!user) {
       throw new Error('Unauthorized');
     }
+    console.log('====>', id);
+
+    // check if the link exists
+    const link = await db
+      .select()
+      .from(links)
+      .where(and(eq(links.id, id), eq(links.userId, user.id)));
+    if (!link || link.length === 0) {
+      return {
+        success: false,
+        message: 'Link not found',
+      };
+    }
 
     // Delete link
-    await db.delete(links).where(eq(links.id, id));
+    await db.delete(links).where(and(eq(links.id, id), eq(links.userId, user.id)));
 
     revalidateTag(CACHE_TAGS.allLinks);
     revalidateTag(CACHE_TAGS.allCategories);
