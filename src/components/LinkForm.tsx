@@ -8,6 +8,10 @@ import { createLink, updateLink, type ActionResponse } from '@/actions/links';
 import { Button } from './ui/button';
 import toast from 'react-hot-toast';
 import { TOAST_STYLES } from '@/lib/constants';
+import { WebsiteIconFetcher } from './WebsiteIconFetcher';
+import { useState } from 'react';
+import { Checkbox } from './ui/checkbox';
+import Image from 'next/image';
 
 interface LinkFormProps {
   link?: Link;
@@ -23,6 +27,8 @@ const initialState: ActionResponse = {
 
 export function LinkForm({ link, isEditing = false, categories }: LinkFormProps) {
   const router = useRouter();
+  const [useCustomIcon, setUseCustomIcon] = useState(false);
+  const [selectedIcon, setSelectedIcon] = useState<string | undefined>(undefined);
 
   const [state, formAction, isPending] = useActionState<ActionResponse, FormData>(async (prevState: ActionResponse, formData: FormData) => {
     try {
@@ -31,7 +37,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
         category: formData.get('category') as string,
         name: formData.get('name') as string,
         description: formData.get('description') as string,
-        icon: formData.get('icon') as string,
+        icon: useCustomIcon ? (formData.get('icon') as string) : selectedIcon,
         url: formData.get('url') as string,
         isRecommended: formData.get('isRecommended') === 'true',
       };
@@ -57,6 +63,11 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
       };
     }
   }, initialState);
+
+  const handleIconSelect = (iconUrl: string) => {
+    setSelectedIcon(iconUrl);
+    setUseCustomIcon(false);
+  };
 
   return (
     <Form action={formAction}>
@@ -134,15 +145,18 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
 
       <FormGroup>
         <FormLabel htmlFor="url">URL</FormLabel>
-        <FormInput
-          id="url"
-          name="url"
-          placeholder="URL"
-          defaultValue={state?.data?.url || link?.url || ''}
-          disabled={isPending}
-          aria-describedby="url-error"
-          className={state?.errors?.url ? 'border-red-500' : ''}
-        />
+        <div className="flex items-center gap-2">
+          <FormInput
+            id="url"
+            name="url"
+            placeholder="URL"
+            defaultValue={state?.data?.url || link?.url || ''}
+            disabled={isPending}
+            aria-describedby="url-error"
+            className={state?.errors?.url ? 'border-red-500' : ''}
+          />
+          <WebsiteIconFetcher url={state?.data?.url || link?.url || ''} onIconSelect={handleIconSelect} isDisabled={isPending} />
+        </div>
         {state?.errors?.url && (
           <p id="url-error" className="text-sm text-red-500">
             {state.errors.url.join(', ')}
@@ -151,21 +165,45 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
       </FormGroup>
 
       <FormGroup>
-        <FormLabel htmlFor="icon">icon</FormLabel>
-        <FormInput
-          id="icon"
-          name="icon"
-          placeholder="Icon"
-          defaultValue={state?.data?.icon || link?.icon || ''}
-          disabled={isPending}
-          aria-describedby="icon-error"
-          className={state?.errors?.icon ? 'border-red-500' : ''}
-        />
-        {state?.errors?.icon && (
-          <p id="icon-error" className="text-sm text-red-500">
-            {state.errors.icon.join(', ')}
-          </p>
-        )}
+        <div className="flex items-center justify-between">
+          <FormLabel htmlFor="icon">Icon</FormLabel>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="useCustomIcon"
+              checked={useCustomIcon}
+              onCheckedChange={(checked: boolean) => setUseCustomIcon(checked)}
+              disabled={isPending}
+            />
+            <label htmlFor="useCustomIcon" className="text-sm text-gray-500">
+              Use custom icon
+            </label>
+          </div>
+        </div>
+        <div className="flex items-start gap-4">
+          <div className="flex-1">
+            <FormInput
+              id="icon"
+              name="icon"
+              placeholder="Icon URL"
+              defaultValue={state?.data?.icon || link?.icon || ''}
+              disabled={isPending || !useCustomIcon}
+              aria-describedby="icon-error"
+              className={state?.errors?.icon ? 'border-red-500' : ''}
+            />
+            {state?.errors?.icon && (
+              <p id="icon-error" className="text-sm text-red-500">
+                {state.errors.icon.join(', ')}
+              </p>
+            )}
+          </div>
+          {(selectedIcon || link?.icon) && !useCustomIcon && (
+            <div className="flex flex-col items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-900">
+              <div className="relative h-8 w-8">
+                <Image src={selectedIcon || link?.icon || ''} alt="Selected icon preview" fill className="object-contain" unoptimized />
+              </div>
+            </div>
+          )}
+        </div>
       </FormGroup>
 
       <FormGroup>
