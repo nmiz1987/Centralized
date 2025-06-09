@@ -12,10 +12,10 @@ export type ActionResponse = {
   success: boolean;
   message: string;
   errors?: Record<string, string[]>;
-  data?: Link;
+  data?: Partial<Link>;
 };
 
-export async function createLink(data: LinkData): Promise<ActionResponse> {
+export async function createLink(data: LinkData, fromAPI: boolean = false): Promise<ActionResponse> {
   try {
     // Security check - ensure user is authenticated
     const user = await getCurrentUser();
@@ -34,6 +34,7 @@ export async function createLink(data: LinkData): Promise<ActionResponse> {
         success: false,
         message: 'Validation failed',
         errors: validationResult.error.flatten().fieldErrors,
+        ...(!fromAPI && { data }),
       };
     }
 

@@ -18,7 +18,9 @@ async function MainButton() {
 
   return (
     <Link href="/dashboard">
-      <Button variant="outline">Go To Dashboard</Button>
+      <Button variant="outline">
+        <span className="hidden sm:inline">Go To </span>Dashboard
+      </Button>
     </Link>
   );
 }
@@ -27,9 +29,9 @@ export default async function MarketingLayout({ children }: { children: React.Re
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-subtle bg-base border-b">
-        <div className="container mx-auto flex items-center justify-between px-4 py-4">
+        <div className="container mx-auto flex items-center justify-between gap-5 px-4 py-4">
           <div className="flex items-center gap-8">
-            <Link href="/" className="text-primary text-2xl font-black">
+            <Link href="/" className="text-primary text-lg font-black sm:text-2xl">
               Centralized
             </Link>
             <nav className="hidden gap-6 md:flex">

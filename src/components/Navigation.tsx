@@ -9,7 +9,7 @@ export async function Navigation() {
   return (
     <aside className="border-subtle bg-elevated sticky top-0 flex w-full flex-row border-b px-2 py-4 sm:flex-col sm:border-r md:w-52 md:px-4 lg:w-64">
       <div className="flex items-center justify-center px-2 sm:mb-8 md:justify-start">
-        <Link href="/" className="text-xl font-bold tracking-tight text-white">
+        <Link href="/dashboard" className="text-xl font-bold tracking-tight text-white">
           <span className="text-primary">Centralized</span>
         </Link>
       </div>

@@ -17,9 +17,12 @@ export async function UserEmail() {
         <UserIcon size={20} className="mr-2 text-gray-500" />
         <span className="hidden truncate text-sm text-gray-300 md:inline">{user?.email}</span>
       </Link>
-      <div className="bg-primary-400 text-md mx-2 flex aspect-square w-8 items-center justify-center truncate rounded-full text-center font-bold text-black md:hidden">
+      <Link
+        href="/dashboard/profile"
+        className="bg-primary-400 text-md mx-2 flex aspect-square w-8 items-center justify-center truncate rounded-full text-center font-bold text-black md:hidden"
+      >
         {user?.email[0].toUpperCase()}
-      </div>
+      </Link>
       <SignOutButton />
     </div>
   );
