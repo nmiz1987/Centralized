@@ -30,7 +30,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
   const router = useRouter();
   const [isUsingCustomIcon, setIsUsingCustomIcon] = useState(false);
   const [selectedIconUrl, setSelectedIconUrl] = useState<string | undefined>(undefined);
-  const [websiteUrl, setWebsiteUrl] = useState<string | undefined>(undefined); // the url in the link
+  const [websiteUrl, setWebsiteUrl] = useState<string | undefined>(link?.url || undefined); // the url in the link
 
   const [state, formAction, isPending] = useActionState<ActionResponse, FormData>(async (prevState: ActionResponse, formData: FormData) => {
     try {
@@ -172,6 +172,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
           <FormLabel htmlFor="icon">Icon</FormLabel>
           <div className="flex items-center gap-2">
             <Checkbox
+              button-name="toggle-custom-icon"
               id="isUsingCustomIcon"
               checked={isUsingCustomIcon}
               onCheckedChange={(checked: boolean) => setIsUsingCustomIcon(checked)}
@@ -200,7 +201,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
             )}
           </div>
           {(selectedIconUrl || link?.icon) && !isUsingCustomIcon && (
-            <div className="flex flex-col items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-900">
+            <div className="border-medium flex flex-col items-center gap-2 rounded-lg border p-2">
               <div className="relative h-8 w-8">
                 <Image src={selectedIconUrl || link?.icon || ''} alt="Selected icon preview" fill className="object-contain" unoptimized />
               </div>
