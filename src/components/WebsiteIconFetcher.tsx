@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { Button } from './ui/button';
 import Image from 'next/image';
@@ -21,7 +23,7 @@ export function WebsiteIconFetcher({ url, onIconSelect, isDisabled }: WebsiteIco
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [icons, setIcons] = useState<IconOption[]>([]);
-  const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
+  const [selectedIconUrl, setSelectedIcon] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const validateUrl = (url: string): boolean => {
@@ -69,7 +71,6 @@ export function WebsiteIconFetcher({ url, onIconSelect, isDisabled }: WebsiteIco
       });
 
       setIcons(iconOptions);
-      setSelectedIcon(iconOptions[0].url); // Select the highest quality by default
     } catch (error) {
       console.error('Error fetching icons:', error);
       setError('Failed to fetch website icons. Please try again or use a custom icon.');
@@ -93,7 +94,7 @@ export function WebsiteIconFetcher({ url, onIconSelect, isDisabled }: WebsiteIco
 
   return (
     <>
-      <Button type="button" variant="outline" size="sm" onClick={handleOpen} disabled={isDisabled || !url} className="ml-2">
+      <Button type="button" variant="outline" size="sm" onClick={handleOpen} disabled={isDisabled || !url} className="ml-2 h-10">
         {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Fetch Icon'}
       </Button>
 
@@ -114,7 +115,7 @@ export function WebsiteIconFetcher({ url, onIconSelect, isDisabled }: WebsiteIco
                 <div
                   key={icon.url}
                   className={`flex cursor-pointer flex-col items-center rounded-lg border p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 ${
-                    selectedIcon === icon.url ? 'border-primary' : 'border-transparent'
+                    selectedIconUrl === icon.url ? 'border-primary' : 'border-transparent'
                   }`}
                   onClick={() => handleSelect(icon.url)}
                 >

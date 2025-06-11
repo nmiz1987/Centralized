@@ -23,12 +23,14 @@ const initialState: ActionResponse = {
   success: false,
   message: '',
   errors: undefined,
+  values: undefined,
 };
 
 export function LinkForm({ link, isEditing = false, categories }: LinkFormProps) {
   const router = useRouter();
-  const [useCustomIcon, setUseCustomIcon] = useState(false);
-  const [selectedIcon, setSelectedIcon] = useState<string | undefined>(undefined);
+  const [isUsingCustomIcon, setIsUsingCustomIcon] = useState(false);
+  const [selectedIconUrl, setSelectedIconUrl] = useState<string | undefined>(undefined);
+  const [websiteUrl, setWebsiteUrl] = useState<string | undefined>(undefined); // the url in the link
 
   const [state, formAction, isPending] = useActionState<ActionResponse, FormData>(async (prevState: ActionResponse, formData: FormData) => {
     try {
@@ -37,7 +39,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
         category: formData.get('category') as string,
         name: formData.get('name') as string,
         description: formData.get('description') as string,
-        icon: useCustomIcon ? (formData.get('icon') as string) : selectedIcon,
+        icon: isUsingCustomIcon ? (formData.get('icon') as string) : selectedIconUrl,
         url: formData.get('url') as string,
         isRecommended: formData.get('isRecommended') === 'true',
       };
@@ -65,8 +67,8 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
   }, initialState);
 
   const handleIconSelect = (iconUrl: string) => {
-    setSelectedIcon(iconUrl);
-    setUseCustomIcon(false);
+    setSelectedIconUrl(iconUrl);
+    setIsUsingCustomIcon(false);
   };
 
   return (
@@ -83,7 +85,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
           id="name"
           name="name"
           placeholder="Link's name"
-          defaultValue={state?.data?.name || link?.name || ''}
+          defaultValue={state?.values?.name || link?.name || ''}
           required
           minLength={3}
           maxLength={100}
@@ -107,7 +109,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
           rows={4}
           minLength={3}
           maxLength={255}
-          defaultValue={state?.data?.description || link?.description || ''}
+          defaultValue={state?.values?.description || link?.description || ''}
           disabled={isPending}
           aria-describedby="description-error"
           className={state?.errors?.description ? 'border-red-500' : ''}
@@ -126,7 +128,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
           id="category"
           name="category"
           placeholder="Category"
-          defaultValue={state?.data?.category || link?.category || ''}
+          defaultValue={state?.values?.category || link?.category || ''}
           disabled={isPending}
           aria-describedby="category-error"
           className={state?.errors?.category ? 'border-red-500' : ''}
@@ -150,12 +152,13 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
             id="url"
             name="url"
             placeholder="URL"
-            defaultValue={state?.data?.url || link?.url || ''}
+            onChange={e => setWebsiteUrl(e.target.value)}
+            defaultValue={state?.values?.url || link?.url || ''}
             disabled={isPending}
             aria-describedby="url-error"
             className={state?.errors?.url ? 'border-red-500' : ''}
           />
-          <WebsiteIconFetcher url={state?.data?.url || link?.url || ''} onIconSelect={handleIconSelect} isDisabled={isPending} />
+          <WebsiteIconFetcher url={websiteUrl || ''} onIconSelect={handleIconSelect} isDisabled={isPending} />
         </div>
         {state?.errors?.url && (
           <p id="url-error" className="text-sm text-red-500">
@@ -169,12 +172,12 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
           <FormLabel htmlFor="icon">Icon</FormLabel>
           <div className="flex items-center gap-2">
             <Checkbox
-              id="useCustomIcon"
-              checked={useCustomIcon}
-              onCheckedChange={(checked: boolean) => setUseCustomIcon(checked)}
+              id="isUsingCustomIcon"
+              checked={isUsingCustomIcon}
+              onCheckedChange={(checked: boolean) => setIsUsingCustomIcon(checked)}
               disabled={isPending}
             />
-            <label htmlFor="useCustomIcon" className="text-sm text-gray-500">
+            <label htmlFor="isUsingCustomIcon" className="text-sm text-gray-500">
               Use custom icon
             </label>
           </div>
@@ -185,8 +188,8 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
               id="icon"
               name="icon"
               placeholder="Icon URL"
-              defaultValue={state?.data?.icon || link?.icon || ''}
-              disabled={isPending || !useCustomIcon}
+              defaultValue={state?.values?.icon || link?.icon || ''}
+              disabled={isPending || !isUsingCustomIcon}
               aria-describedby="icon-error"
               className={state?.errors?.icon ? 'border-red-500' : ''}
             />
@@ -196,10 +199,10 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
               </p>
             )}
           </div>
-          {(selectedIcon || link?.icon) && !useCustomIcon && (
+          {(selectedIconUrl || link?.icon) && !isUsingCustomIcon && (
             <div className="flex flex-col items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-900">
               <div className="relative h-8 w-8">
-                <Image src={selectedIcon || link?.icon || ''} alt="Selected icon preview" fill className="object-contain" unoptimized />
+                <Image src={selectedIconUrl || link?.icon || ''} alt="Selected icon preview" fill className="object-contain" unoptimized />
               </div>
             </div>
           )}
@@ -211,7 +214,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
         <FormSelect
           id="isRecommended"
           name="isRecommended"
-          defaultValue={state?.data?.isRecommended || link?.isRecommended ? 'true' : 'false'}
+          defaultValue={state?.values?.isRecommended || link?.isRecommended ? 'true' : 'false'}
           options={[
             { label: 'True', value: 'true' },
             { label: 'False', value: 'false' },
