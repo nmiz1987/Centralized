@@ -21,7 +21,7 @@ export default function SignInPage() {
 
   const [state, formAction, isPending] = useActionState<ActionResponse, FormData>(async (prevState: ActionResponse, formData: FormData) => {
     try {
-      const result = await signIn(formData);
+      const result = await signIn(formData, true);
 
       if (result.success) {
         toast.success(result.message, TOAST_STYLES.success);

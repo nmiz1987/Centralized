@@ -126,11 +126,11 @@ export async function updateLink(id: number, data: LinkData, returnDataInRespons
     const validatedData = validationResult.data;
     const updateData: Record<string, unknown> = {};
 
-    updateData.category = validatedData.category || 'General';
-    if (validatedData.icon !== undefined) updateData.icon = validatedData.icon;
     if (validatedData.name !== undefined) updateData.name = validatedData.name;
     if (validatedData.description !== undefined) updateData.description = validatedData.description;
     if (validatedData.url !== undefined) updateData.url = validatedData.url;
+    if (validatedData.category !== undefined) updateData.category = validatedData.category;
+    if (validatedData.icon !== undefined) updateData.icon = validatedData.icon;
     if (validatedData.isRecommended !== undefined) updateData.isRecommended = validatedData.isRecommended;
 
     // Update link
