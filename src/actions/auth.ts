@@ -25,14 +25,26 @@ export async function resetPassword(formData: FormData): Promise<ActionResponse>
       };
     }
 
-    // Extract data from form
-    const data = {
-      newPassword: formData.get('newPassword') as string,
-      confirmPassword: formData.get('confirmPassword') as string,
+    // Extract and sanitize data from form
+    const newPassword = (formData.get('newPassword') as string)?.trim();
+    const confirmPassword = (formData.get('confirmPassword') as string)?.trim();
+
+    // Basic input validation
+    if (!newPassword || !confirmPassword) {
+      return {
+        success: false,
+        message: 'Password fields cannot be empty',
+      };
+    }
+
+    // Remove any potential XSS or injection attempts
+    const sanitizedData = {
+      newPassword: newPassword.replace(/[<>]/g, ''),
+      confirmPassword: confirmPassword.replace(/[<>]/g, ''),
     };
 
     // Check if passwords match
-    if (data.newPassword !== data.confirmPassword) {
+    if (sanitizedData.newPassword !== sanitizedData.confirmPassword) {
       return {
         success: false,
         message: 'Ops! Passwords do not match',
@@ -40,7 +52,7 @@ export async function resetPassword(formData: FormData): Promise<ActionResponse>
     }
 
     // Validate with Zod
-    const validationResult = ResetPasswordSchema.safeParse(data);
+    const validationResult = ResetPasswordSchema.safeParse(sanitizedData);
     if (!validationResult.success) {
       return {
         success: false,
@@ -50,7 +62,11 @@ export async function resetPassword(formData: FormData): Promise<ActionResponse>
     }
 
     // Find user by email
-    const result = await resetUserPassword(session.userId, data.newPassword);
+    const result = await resetUserPassword(session.userId, sanitizedData.newPassword);
+
+    // Clear any sensitive data from memory
+    sanitizedData.newPassword = '';
+    sanitizedData.confirmPassword = '';
 
     return result;
   } catch (error) {
@@ -67,46 +83,62 @@ export async function resetPassword(formData: FormData): Promise<ActionResponse>
 
 export async function signIn(formData: FormData, returnDataInResponse: boolean): Promise<ActionResponse> {
   try {
-    // Extract data from form
-    const data = {
-      email: formData.get('email') as string,
-      password: formData.get('password') as string,
+    // Extract and sanitize data from form
+    const email = (formData.get('email') as string)?.trim().toLowerCase();
+    const password = (formData.get('password') as string)?.trim();
+
+    // Basic input validation
+    if (!email || !password) {
+      return {
+        success: false,
+        message: 'Email and password are required',
+        ...(returnDataInResponse && { values: { email: email || '', password: '' } }),
+      };
+    }
+
+    // Remove any potential XSS or injection attempts
+    const sanitizedData = {
+      email: email.replace(/[<>]/g, ''),
+      password: password.replace(/[<>]/g, ''),
     };
 
     // Validate with Zod
-    const validationResult = SignInSchema.safeParse(data);
+    const validationResult = SignInSchema.safeParse(sanitizedData);
     if (!validationResult.success) {
       return {
         success: false,
         message: 'Validation failed',
         errors: validationResult.error.flatten().fieldErrors,
-        ...(returnDataInResponse && { values: data }),
+        ...(returnDataInResponse && { values: sanitizedData }),
       };
     }
 
     // Find user by email
-    const user = await getUserByEmail(data.email);
+    const user = await getUserByEmail(sanitizedData.email);
     if (!user) {
       return {
         success: false,
         message: 'Invalid email or password',
-        ...(returnDataInResponse && { values: data }),
+        ...(returnDataInResponse && { values: { email: sanitizedData.email, password: '' } }),
       };
     }
 
     // Verify password
-    const isPasswordValid = await verifyPassword(data.password, user.password);
+    const isPasswordValid = await verifyPassword(sanitizedData.password, user.password);
     if (!isPasswordValid) {
       return {
         success: false,
         message: 'Invalid email or password',
-        ...(returnDataInResponse && { values: data }),
+        ...(returnDataInResponse && { values: { email: sanitizedData.email, password: '' } }),
       };
     }
 
     // Create session
     await createSession(user.id);
     await updateUserLastVisitedAt(user.id);
+
+    // Clear sensitive data from memory
+    sanitizedData.password = '';
 
     return {
       success: true,
@@ -126,35 +158,49 @@ export async function signIn(formData: FormData, returnDataInResponse: boolean):
 
 export async function signUp(formData: FormData, returnDataInResponse: boolean): Promise<ActionResponse> {
   try {
-    // Extract data from form
-    const data = {
-      email: formData.get('email') as string,
-      password: formData.get('password') as string,
-      confirmPassword: formData.get('confirmPassword') as string,
+    // Extract and sanitize data from form
+    const email = (formData.get('email') as string)?.trim().toLowerCase();
+    const password = (formData.get('password') as string)?.trim();
+    const confirmPassword = (formData.get('confirmPassword') as string)?.trim();
+
+    // Basic input validation
+    if (!email || !password || !confirmPassword) {
+      return {
+        success: false,
+        message: 'All fields are required',
+        ...(returnDataInResponse && { values: { email: email || '', password: '', confirmPassword: '' } }),
+      };
+    }
+
+    // Remove any potential XSS or injection attempts
+    const sanitizedData = {
+      email: email.replace(/[<>]/g, ''),
+      password: password.replace(/[<>]/g, ''),
+      confirmPassword: confirmPassword.replace(/[<>]/g, ''),
     };
 
     // Check if passwords match
-    if (data.password !== data.confirmPassword) {
+    if (sanitizedData.password !== sanitizedData.confirmPassword) {
       return {
         success: false,
         message: 'Ops! Passwords do not match',
-        ...(returnDataInResponse && { values: data }),
+        ...(returnDataInResponse && { values: { email: sanitizedData.email, password: '', confirmPassword: '' } }),
       };
     }
 
     // Validate with Zod
-    const validationResult = SignUpSchema.safeParse(data);
+    const validationResult = SignUpSchema.safeParse(sanitizedData);
     if (!validationResult.success) {
       return {
         success: false,
         message: 'Validation failed',
         errors: validationResult.error.flatten().fieldErrors,
-        ...(returnDataInResponse && { values: data }),
+        ...(returnDataInResponse && { values: { email: sanitizedData.email, password: '', confirmPassword: '' } }),
       };
     }
 
     // Check if user already exists
-    const existingUser = await getUserByEmail(data.email);
+    const existingUser = await getUserByEmail(sanitizedData.email);
     if (existingUser) {
       return {
         success: false,
@@ -162,12 +208,12 @@ export async function signUp(formData: FormData, returnDataInResponse: boolean):
         errors: {
           email: ['Try another email'],
         },
-        ...(returnDataInResponse && { values: data }),
+        ...(returnDataInResponse && { values: { email: sanitizedData.email, password: '', confirmPassword: '' } }),
       };
     }
 
     // Create new user
-    const user = await createUser(data.email, data.password);
+    const user = await createUser(sanitizedData.email, sanitizedData.password);
     if (!user) {
       return {
         success: false,
@@ -175,12 +221,16 @@ export async function signUp(formData: FormData, returnDataInResponse: boolean):
         errors: {
           error: ['Failed to create user'],
         },
-        ...(returnDataInResponse && { values: data }),
+        ...(returnDataInResponse && { values: { email: sanitizedData.email, password: '', confirmPassword: '' } }),
       };
     }
 
     // Create session for the newly registered user
     await createSession(user.id);
+
+    // Clear sensitive data from memory
+    sanitizedData.password = '';
+    sanitizedData.confirmPassword = '';
 
     return {
       success: true,
