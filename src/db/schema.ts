@@ -3,13 +3,17 @@ import { pgTable, serial, text, timestamp, boolean } from 'drizzle-orm/pg-core';
 
 // Links table
 export const links = pgTable('links', {
+  // primary key
   id: serial('id').primaryKey(),
+  // required fields
   name: text('name').notNull(),
   description: text('description').notNull(),
-  category: text('category').notNull().default('General'),
   url: text('url').notNull(),
+  category: text('category').notNull(),
+  isRecommended: boolean('is_recommended').default(false),
+  // optional fields
   icon: text('icon'),
-  isRecommended: boolean('is_recommended').default(false).notNull(),
+  // auto-generated fields
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
   userId: text('user_id').notNull(),

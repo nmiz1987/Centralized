@@ -12,10 +12,10 @@ export type ActionResponse = {
   success: boolean;
   message: string;
   errors?: Record<string, string[]>;
-  values?: Partial<Link>;
+  values?: Link | LinkData; // Link - new link from server, LinkData - link's data from client (for failed validation)
 };
 
-export async function createLink(data: LinkData, fromAPI: boolean = false): Promise<ActionResponse> {
+export async function createLink(data: LinkData, returnDataInResponse: boolean): Promise<ActionResponse> {
   try {
     // Security check - ensure user is authenticated
     const user = await getCurrentUser();
@@ -27,14 +27,23 @@ export async function createLink(data: LinkData, fromAPI: boolean = false): Prom
       };
     }
 
+    const trimmedData: LinkData = {
+      ...data,
+      category: data.category.trim(),
+      name: data.name.trim(),
+      description: data.description.trim(),
+      url: data.url.trim(),
+      icon: data.icon?.trim(),
+    };
+
     // Validate with Zod
-    const validationResult = LinkSchema.safeParse(data);
+    const validationResult = LinkSchema.safeParse(trimmedData);
     if (!validationResult.success) {
       return {
         success: false,
         message: 'Validation failed',
         errors: validationResult.error.flatten().fieldErrors,
-        ...(!fromAPI && { data }),
+        ...(returnDataInResponse && { values: trimmedData as LinkData }),
       };
     }
 
@@ -43,12 +52,12 @@ export async function createLink(data: LinkData, fromAPI: boolean = false): Prom
     const newLink = await db
       .insert(links)
       .values({
-        category: validatedData.category ?? 'General',
-        icon: validatedData.icon,
         name: validatedData.name,
-        url: validatedData.url,
-        isRecommended: validatedData.isRecommended,
         description: validatedData.description,
+        url: validatedData.url,
+        category: validatedData.category,
+        isRecommended: validatedData.isRecommended,
+        icon: validatedData.icon,
         userId: user.id,
       })
       .returning();
@@ -56,7 +65,7 @@ export async function createLink(data: LinkData, fromAPI: boolean = false): Prom
     revalidateTag(CACHE_TAGS.allLinks);
     revalidateTag(CACHE_TAGS.allCategories);
 
-    return { success: true, message: 'Link created successfully', values: newLink[0] };
+    return { success: true, message: 'Link created successfully', values: newLink[0] as Link };
   } catch (error) {
     console.error('Error creating link:', error);
     return {
@@ -67,7 +76,7 @@ export async function createLink(data: LinkData, fromAPI: boolean = false): Prom
   }
 }
 
-export async function updateLink(id: number, data: Partial<Link>): Promise<ActionResponse> {
+export async function updateLink(id: number, data: LinkData, returnDataInResponse: boolean): Promise<ActionResponse> {
   try {
     // Security check - ensure user is authenticated
     const user = await getCurrentUser();
@@ -88,18 +97,28 @@ export async function updateLink(id: number, data: Partial<Link>): Promise<Actio
       return {
         success: false,
         message: 'Link not found',
+        ...(returnDataInResponse && { values: data as LinkData }),
       };
     }
 
-    // Allow partial validation for updates
-    const UpdateLinkSchema = LinkSchema.partial();
-    const validationResult = UpdateLinkSchema.safeParse(data);
+    const trimmedData: LinkData = {
+      ...data,
+      category: data.category.trim(),
+      name: data.name.trim(),
+      description: data.description.trim(),
+      url: data.url.trim(),
+      icon: data.icon?.trim(),
+    };
+
+    // Validate with Zod
+    const validationResult = LinkSchema.safeParse(trimmedData);
 
     if (!validationResult.success) {
       return {
         success: false,
         message: 'Validation failed',
         errors: validationResult.error.flatten().fieldErrors,
+        ...(returnDataInResponse && { values: trimmedData as LinkData }),
       };
     }
 
@@ -142,7 +161,6 @@ export async function deleteLink(id: number) {
     if (!user) {
       throw new Error('Unauthorized');
     }
-    console.log('====>', id);
 
     // check if the link exists
     const link = await db

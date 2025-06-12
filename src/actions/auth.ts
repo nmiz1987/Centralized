@@ -42,7 +42,6 @@ export async function resetPassword(formData: FormData): Promise<ActionResponse>
     // Validate with Zod
     const validationResult = ResetPasswordSchema.safeParse(data);
     if (!validationResult.success) {
-      console.log('===>', validationResult.error.flatten().fieldErrors);
       return {
         success: false,
         message: 'Validation failed',
@@ -66,7 +65,7 @@ export async function resetPassword(formData: FormData): Promise<ActionResponse>
   }
 }
 
-export async function signIn(formData: FormData, fromAPI: boolean = false): Promise<ActionResponse> {
+export async function signIn(formData: FormData, returnDataInResponse: boolean): Promise<ActionResponse> {
   try {
     // Extract data from form
     const data = {
@@ -81,7 +80,7 @@ export async function signIn(formData: FormData, fromAPI: boolean = false): Prom
         success: false,
         message: 'Validation failed',
         errors: validationResult.error.flatten().fieldErrors,
-        ...(fromAPI && { values: data }),
+        ...(returnDataInResponse && { values: data }),
       };
     }
 
@@ -91,7 +90,7 @@ export async function signIn(formData: FormData, fromAPI: boolean = false): Prom
       return {
         success: false,
         message: 'Invalid email or password',
-        ...(fromAPI && { values: data }),
+        ...(returnDataInResponse && { values: data }),
       };
     }
 
@@ -101,7 +100,7 @@ export async function signIn(formData: FormData, fromAPI: boolean = false): Prom
       return {
         success: false,
         message: 'Invalid email or password',
-        ...(fromAPI && { values: data }),
+        ...(returnDataInResponse && { values: data }),
       };
     }
 
@@ -125,7 +124,7 @@ export async function signIn(formData: FormData, fromAPI: boolean = false): Prom
   }
 }
 
-export async function signUp(formData: FormData, fromAPI: boolean = false): Promise<ActionResponse> {
+export async function signUp(formData: FormData, returnDataInResponse: boolean): Promise<ActionResponse> {
   try {
     // Extract data from form
     const data = {
@@ -139,7 +138,7 @@ export async function signUp(formData: FormData, fromAPI: boolean = false): Prom
       return {
         success: false,
         message: 'Ops! Passwords do not match',
-        ...(fromAPI && { values: data }),
+        ...(returnDataInResponse && { values: data }),
       };
     }
 
@@ -150,7 +149,7 @@ export async function signUp(formData: FormData, fromAPI: boolean = false): Prom
         success: false,
         message: 'Validation failed',
         errors: validationResult.error.flatten().fieldErrors,
-        ...(fromAPI && { values: data }),
+        ...(returnDataInResponse && { values: data }),
       };
     }
 
@@ -163,7 +162,7 @@ export async function signUp(formData: FormData, fromAPI: boolean = false): Prom
         errors: {
           email: ['Try another email'],
         },
-        ...(fromAPI && { values: data }),
+        ...(returnDataInResponse && { values: data }),
       };
     }
 
@@ -176,7 +175,7 @@ export async function signUp(formData: FormData, fromAPI: boolean = false): Prom
         errors: {
           error: ['Failed to create user'],
         },
-        ...(fromAPI && { values: data }),
+        ...(returnDataInResponse && { values: data }),
       };
     }
 
