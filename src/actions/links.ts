@@ -12,7 +12,7 @@ export type ActionResponse = {
   success: boolean;
   message: string;
   errors?: Record<string, string[]>;
-  data?: Partial<Link>;
+  values?: Partial<Link>;
 };
 
 export async function createLink(data: LinkData, fromAPI: boolean = false): Promise<ActionResponse> {
@@ -56,7 +56,7 @@ export async function createLink(data: LinkData, fromAPI: boolean = false): Prom
     revalidateTag(CACHE_TAGS.allLinks);
     revalidateTag(CACHE_TAGS.allCategories);
 
-    return { success: true, message: 'Link created successfully', data: newLink[0] };
+    return { success: true, message: 'Link created successfully', values: newLink[0] };
   } catch (error) {
     console.error('Error creating link:', error);
     return {
@@ -124,7 +124,7 @@ export async function updateLink(id: number, data: Partial<Link>): Promise<Actio
     revalidateTag(CACHE_TAGS.allLinks);
     revalidateTag(CACHE_TAGS.allCategories);
 
-    return { success: true, message: 'Link updated successfully', data: updatedLink[0] };
+    return { success: true, message: 'Link updated successfully', values: updatedLink[0] };
   } catch (error) {
     console.error('Error updating link:', error);
     return {

@@ -13,6 +13,7 @@ const initialState: ActionResponse = {
   success: false,
   message: '',
   errors: undefined,
+  values: undefined,
 };
 
 export function ResetPasswordForm() {
