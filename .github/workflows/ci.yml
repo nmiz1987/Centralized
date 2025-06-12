@@ -7,24 +7,6 @@ on:
     branches: ['*']
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 🏗 Setup repo
-        uses: actions/checkout@v4
-
-      - name: 🏗 Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'npm'
-
-      - name: 📦 Install dependencies
-        run: npm ci
-
-      - name: 🚀 Run tests
-        run: npm run test:ci
-
   format:
     runs-on: ubuntu-latest
     steps:

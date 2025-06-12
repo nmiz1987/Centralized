@@ -1,0 +1,8 @@
+name: ✅ New Task
+description: Create a new task for the project.
+title: 'Task: '
+body:    
+  - type: textarea
+    attributes:
+      label: Additional information
+      description: Add any other information related to the bug here, screenshots if applicable.
