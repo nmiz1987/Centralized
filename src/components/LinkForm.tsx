@@ -71,6 +71,17 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
     setIsUsingCustomIcon(false);
   };
 
+  const validateUrl = (url: string | null | undefined): boolean => {
+    if (!url) return false;
+
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   return (
     <Form action={formAction}>
       {state?.message && !state.success && (
@@ -158,6 +169,13 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
             aria-describedby="url-error"
             className={state?.errors?.url ? 'border-red-500' : ''}
           />
+          {(selectedIconUrl || validateUrl(link?.icon)) && !isUsingCustomIcon && (
+            <div className="border-medium flex flex-col items-center rounded-lg border p-2">
+              <div className="relative h-6 w-6">
+                <Image src={selectedIconUrl || link?.icon || ''} alt="Selected icon preview" fill className="object-contain" sizes="24px" />
+              </div>
+            </div>
+          )}
           <WebsiteIconFetcher url={websiteUrl || ''} onIconSelect={handleIconSelect} isDisabled={isPending} />
         </div>
         {state?.errors?.url && (
@@ -183,7 +201,7 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
             </label>
           </div>
         </div>
-        <div className="flex items-start gap-4">
+        <div className="flex items-center gap-4">
           <div className="flex-1">
             <FormInput
               id="icon"
@@ -200,13 +218,6 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
               </p>
             )}
           </div>
-          {(selectedIconUrl || link?.icon) && !isUsingCustomIcon && (
-            <div className="border-medium flex flex-col items-center gap-2 rounded-lg border p-2">
-              <div className="relative h-8 w-8">
-                <Image src={selectedIconUrl || link?.icon || ''} alt="Selected icon preview" fill className="object-contain" unoptimized />
-              </div>
-            </div>
-          )}
         </div>
       </FormGroup>
 

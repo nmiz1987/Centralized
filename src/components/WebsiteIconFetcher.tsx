@@ -94,7 +94,7 @@ export function WebsiteIconFetcher({ url, onIconSelect, isDisabled }: WebsiteIco
 
   return (
     <>
-      <Button type="button" variant="outline" size="sm" onClick={handleOpen} disabled={isDisabled || !url} className="ml-2 h-10">
+      <Button type="button" variant="outline" size="sm" onClick={handleOpen} disabled={isDisabled || !url} className="h-10">
         {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Fetch Icon'}
       </Button>
 
