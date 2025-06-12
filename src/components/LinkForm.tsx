@@ -2,7 +2,7 @@
 
 import { useActionState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Link } from '@/db/schema';
+import { Link, links } from '@/db/schema';
 import { Form, FormGroup, FormLabel, FormInput, FormTextarea, FormError, FormSelect } from './ui/Form';
 import { createLink, updateLink, type ActionResponse } from '@/actions/links';
 import { Button } from './ui/button';
@@ -36,16 +36,16 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
     try {
       // Extract data from form
       const data = {
-        category: formData.get('category') as string,
-        name: formData.get('name') as string,
-        description: formData.get('description') as string,
-        icon: isUsingCustomIcon ? (formData.get('icon') as string) : selectedIconUrl,
-        url: formData.get('url') as string,
-        isRecommended: formData.get('isRecommended') === 'true',
+        category: formData.get(links.category.name) as string,
+        name: formData.get(links.name.name) as string,
+        description: formData.get(links.description.name) as string,
+        icon: isUsingCustomIcon ? (formData.get(links.icon.name) as string) : selectedIconUrl,
+        url: formData.get(links.url.name) as string,
+        isRecommended: formData.get(links.isRecommended.name) === 'true',
       };
 
       // Call the appropriate action based on whether we're editing or creating
-      const result = isEditing ? await updateLink(Number(link!.id), data) : await createLink(data);
+      const result = isEditing ? await updateLink(Number(link!.id), data, true) : await createLink(data, true);
 
       // Handle successful submission
       if (result.success) {
@@ -93,8 +93,8 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
       <FormGroup>
         <FormLabel htmlFor="name">Name</FormLabel>
         <FormInput
-          id="name"
-          name="name"
+          id={links.name.name}
+          name={links.name.name}
           placeholder="Link's name"
           defaultValue={state?.values?.name || link?.name || ''}
           required
@@ -114,8 +114,8 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
       <FormGroup>
         <FormLabel htmlFor="description">Description</FormLabel>
         <FormTextarea
-          id="description"
-          name="description"
+          id={links.description.name}
+          name={links.description.name}
           placeholder="Describe the link..."
           rows={4}
           minLength={3}
@@ -136,8 +136,8 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
         <FormLabel htmlFor="category">Category</FormLabel>
         <FormInput
           list="categories"
-          id="category"
-          name="category"
+          id={links.category.name}
+          name={links.category.name}
           placeholder="Category"
           defaultValue={state?.values?.category || link?.category || ''}
           disabled={isPending}
@@ -160,8 +160,8 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
         <FormLabel htmlFor="url">URL</FormLabel>
         <div className="flex items-center gap-2">
           <FormInput
-            id="url"
-            name="url"
+            id={links.url.name}
+            name={links.url.name}
             placeholder="URL"
             onChange={e => setWebsiteUrl(e.target.value)}
             defaultValue={state?.values?.url || link?.url || ''}
@@ -204,8 +204,8 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
         <div className="flex items-center gap-4">
           <div className="flex-1">
             <FormInput
-              id="icon"
-              name="icon"
+              id={links.icon.name}
+              name={links.icon.name}
               placeholder="Icon URL"
               defaultValue={state?.values?.icon || link?.icon || ''}
               disabled={isPending || !isUsingCustomIcon}
@@ -224,8 +224,8 @@ export function LinkForm({ link, isEditing = false, categories }: LinkFormProps)
       <FormGroup>
         <FormLabel htmlFor="isRecommended">Is Recommended</FormLabel>
         <FormSelect
-          id="isRecommended"
-          name="isRecommended"
+          id={links.isRecommended.name}
+          name={links.isRecommended.name}
           defaultValue={state?.values?.isRecommended || link?.isRecommended ? 'true' : 'false'}
           options={[
             { label: 'True', value: 'true' },

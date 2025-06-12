@@ -3,7 +3,7 @@ import { LockIcon } from 'lucide-react';
 import { useActionState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Form, FormGroup, FormLabel, FormInput, FormError } from './ui/Form';
-import { type ActionResponse } from '@/actions/links';
+import { type ActionResponse } from '@/actions/auth';
 import { Button } from './ui/button';
 import { resetPassword } from '@/actions/auth';
 import toast from 'react-hot-toast';

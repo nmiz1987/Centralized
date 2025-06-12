@@ -6,7 +6,7 @@ import { links, users } from '@/db/schema';
 import { unstable_cacheTag as cacheTag } from 'next/cache';
 import { CACHE_TAGS } from './constants';
 
-export async function getCategoriesByUserId(userId: string) {
+export async function getCategoriesByUserId(userId: string): Promise<string[]> {
   'use cache';
   cacheTag(CACHE_TAGS.allCategories);
   try {
@@ -17,17 +17,27 @@ export async function getCategoriesByUserId(userId: string) {
       },
     });
 
-    return [...new Set(result.map(item => item.category))];
+    if (!result) return [];
+
+    const categoriesSet = new Set<string>();
+
+    result.forEach(item => {
+      if (item.category) {
+        categoriesSet.add(item.category);
+      }
+    });
+
+    return Array.from(categoriesSet);
   } catch (error) {
     console.error('Error fetching categories by user ID:', error);
     throw new Error('Failed to fetch categories by user ID');
   }
 }
 
-export async function getCategories() {
+export async function getCategories(): Promise<string[]> {
   try {
     const session = await getSession();
-    if (!session || !session.isActiveSession) return null;
+    if (!session || !session.isActiveSession) return [];
 
     const results = await getCategoriesByUserId(session.userId);
     return results;

@@ -23,7 +23,7 @@ export async function POST(request: Request) {
   try {
     const data: LinkData = await request.json();
 
-    const result = await createLink(data);
+    const result = await createLink(data, false);
     if (!result.success) {
       return NextResponse.json(result, { status: 400 });
     }
@@ -36,13 +36,23 @@ export async function POST(request: Request) {
 }
 
 // Update link
-export async function PATCH(request: Request) {
+export async function PUT(request: Request) {
   try {
-    const data: Link = await request.json();
-    if (!data) {
+    const info: Link = await request.json();
+    if (!info) {
       return NextResponse.json({ error: 'No data provided' }, { status: 400 });
     }
-    const result = await updateLink(Number(data.id), data);
+
+    const data: LinkData = {
+      category: info.category,
+      name: info.name,
+      description: info.description,
+      url: info.url,
+      ...(info.isRecommended && { isRecommended: info.isRecommended }),
+      ...(info.icon && { icon: info.icon }),
+    };
+
+    const result = await updateLink(Number(info.id), data, false);
     if (!result.success) {
       return NextResponse.json(result, { status: 400 });
     }

@@ -21,7 +21,7 @@ export default function SignUpPage() {
 
   const [state, formAction, isPending] = useActionState<ActionResponse, FormData>(async (prevState: ActionResponse, formData: FormData) => {
     try {
-      const result = await signUp(formData);
+      const result = await signUp(formData, true);
 
       if (result.success) {
         toast.success(result.message, TOAST_STYLES.success);
